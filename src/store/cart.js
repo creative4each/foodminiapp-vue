@@ -4,6 +4,7 @@ const STORAGE_KEY = 'foodminiapp_cart_v1'
 export const useCartStore = defineStore('cart', {
   state: () => ({
     items: JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'),
+    isLoadingList: false, // флаг загрузки списка
   }),
   getters: {
     list: (s) => Object.values(s.items),
@@ -40,9 +41,16 @@ export const useCartStore = defineStore('cart', {
       if (next === 0) { delete this.items[item.id]; this.persist(); return }
       this.setFromCatalogItem(item, next)
     },
+    remove(itemId){
+      delete this.items[itemId]
+      this.persist()
+    },
     clear(){
       this.items = {}
       this.persist()
+    },
+    setLoadingList(value){
+      this.isLoadingList = value
     },
     persist(){
       localStorage.setItem(STORAGE_KEY, JSON.stringify(this.items))

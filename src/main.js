@@ -10,6 +10,10 @@ app.use(router)
 
 const tg = window.Telegram?.WebApp
 if (tg) {
+  console.log('🚀 Telegram Mini App запущен')
+  console.log('👤 User:', tg.initDataUnsafe?.user)
+  console.log('🎨 Theme:', tg.themeParams)
+  
   const applyTheme = () => {
     const p = tg.themeParams || {}
     const set = (k, v) => document.documentElement.style.setProperty(k, v)
@@ -21,6 +25,9 @@ if (tg) {
     set('--tg-section-sep', p.section_separator_color ? '#' + p.section_separator_color : '#e5e7eb')
   }
   tg.ready(); tg.expand(); applyTheme(); tg.onEvent('themeChanged', applyTheme)
+} else {
+  console.warn('⚠️ Приложение НЕ запущено как Telegram Mini App')
+  console.warn('ℹ️ Для полной функциональности откройте через Telegram')
 }
 
 app.mount('#app')
