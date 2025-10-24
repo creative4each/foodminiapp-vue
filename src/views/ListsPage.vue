@@ -38,13 +38,13 @@
 
       <div class="list-actions">
         <button class="action-btn primary" @click="loadListToCart(list.list_id)">
-          🛒 Загрузить
+          Загрузить
         </button>
         <button class="action-btn secondary" @click="editList(list)">
-          ✏️ Переименовать
+          Переименовать
         </button>
         <button class="action-btn danger" @click="confirmDelete(list)">
-          🗑️ Удалить
+          Удалить
         </button>
       </div>
     </div>
@@ -84,12 +84,14 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { getLists, deleteList as apiDeleteList, updateList, loadList } from '../api/googleApi'
+import { deleteList as apiDeleteList, updateList, loadList } from '../api/googleApi'
 import { useCartStore } from '../store/cart'
+import { useCatalogStore } from '../store/catalog'
 import { getTelegramUserId } from '../utils/telegram'
 
 const router = useRouter()
 const cart = useCartStore()
+const catalogStore = useCatalogStore()
 
 const lists = ref([])
 const loading = ref(true)
@@ -114,11 +116,8 @@ onMounted(async () => {
 async function loadLists() {
   loading.value = true
   try {
-    const tgUserId = getTelegramUserId()
-    console.log('📋 Загрузка списков для пользователя:', tgUserId)
-    const response = await getLists(tgUserId)
-    lists.value = response.lists || []
-    console.log('📋 Загружено списков:', lists.value.length)
+    // Используем кэшированные данные
+    lists.value = await catalogStore.fetchUserLists()
   } catch (error) {
     console.error('Ошибка загрузки списков:', error)
     alert('Не удалось загрузить списки')
@@ -150,7 +149,8 @@ function formatDate(dateStr) {
 }
 
 function rub(n) {
-  return Math.round(n) + '₽'
+  const rounded = Math.round(n)
+  return rounded.toLocaleString('ru-RU') + ' ₽'
 }
 
 async function loadListToCart(listId) {
@@ -174,12 +174,10 @@ async function loadListToCart(listId) {
     // Очищаем корзину
     cart.clear()
     
-    // Загружаем товары из списка в корзину
-    // Нужно получить полные данные товаров из каталога
-    const { loadCatalog } = await import('../api/googleApi')
-    const catalogData = await loadCatalog()
+    // Используем закэшированный каталог
+    await catalogStore.fetchCatalog()
     const catalogMap = {}
-    catalogData.catalog.forEach(item => {
+    catalogStore.catalog.forEach(item => {
       catalogMap[item.id] = item
     })
     
@@ -224,11 +222,10 @@ async function saveEdit() {
       undefined  // weight не меняем
     )
     
-    // Обновляем локально
-    const index = lists.value.findIndex(l => l.list_id === editingList.value.list_id)
-    if (index !== -1) {
-      lists.value[index].list_name = editingListName.value.trim()
-    }
+    // Обновляем в кэше
+    const updatedList = { ...editingList.value, list_name: editingListName.value.trim() }
+    catalogStore.updateListInCache(updatedList)
+    lists.value = catalogStore.userLists
     
     closeEditModal()
   } catch (error) {
@@ -252,8 +249,9 @@ async function performDelete() {
   try {
     await apiDeleteList(deletingList.value.list_id)
     
-    // Удаляем из локального списка
-    lists.value = lists.value.filter(l => l.list_id !== deletingList.value.list_id)
+    // Удаляем из кэша
+    catalogStore.removeListFromCache(deletingList.value.list_id)
+    lists.value = catalogStore.userLists
     
     closeDeleteModal()
   } catch (error) {

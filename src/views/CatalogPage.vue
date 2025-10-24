@@ -49,29 +49,31 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { loadCatalog } from '../api/googleApi'
+import { useCatalogStore } from '../store/catalog'
 import ProductCard from '../components/ProductCard.vue'
 import SearchBar from '../components/SearchBar.vue'
 
+const catalogStore = useCatalogStore()
+
 const mode = ref('stores') // режим: 'stores' | 'categories'
-const stores = ref([])
-const categories = ref([])
-const catalog = ref([])
 const activeId = ref(null)
 const searchQuery = ref('')
-const loading = ref(true) // флаг загрузки каталога
+
+// Используем данные из store напрямую
+const stores = computed(() => catalogStore.stores)
+const categories = computed(() => catalogStore.categories)
+const catalog = computed(() => catalogStore.catalog)
+const loading = computed(() => catalogStore.isLoadingCatalog)
 
 onMounted(async () => {
-  try {
-    const data = await loadCatalog()
-    stores.value = data.stores || []
-    categories.value = data.categories || [] // ← теперь загружаем категории
-    catalog.value = data.catalog || []
-
-    if (mode.value === 'stores' && stores.value[0]) activeId.value = stores.value[0].id
-    if (mode.value === 'categories' && categories.value[0]) activeId.value = categories.value[0].id
-  } finally {
-    loading.value = false
+  // Данные уже загружены в App.vue, просто используем из кэша
+  await catalogStore.fetchCatalog() // это мгновенно вернёт закэшированные данные
+  
+  if (mode.value === 'stores' && stores.value[0]) {
+    activeId.value = stores.value[0].id
+  }
+  if (mode.value === 'categories' && categories.value[0]) {
+    activeId.value = categories.value[0].id
   }
 })
 

@@ -10,7 +10,8 @@
 html, body, #app { height: 100%; margin: 0; }
 body { font-family: -apple-system, Inter, Roboto, Arial; background: var(--tg-bg); color: var(--tg-text); }
 h1, h2, h3 { margin: 0 0 12px; }
-.container { padding: 16px 16px calc(100px + var(--safe-bottom, 0)); }
+h1 { text-align: center; }
+.container { padding: 16px 16px calc(70px + env(safe-area-inset-bottom, 0)); }
 
 .btn { border:1px solid #ddd; border-radius:14px; padding:10px 12px; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,.06); cursor:pointer; }
 .stores { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:12px; margin-bottom:16px; }
@@ -26,44 +27,57 @@ h1, h2, h3 { margin: 0 0 12px; }
 /* === Navbar === */
 .navbar {
   position: fixed;
-  left: 12px;
-  right: 12px;
-  bottom: 16px;
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: flex;
-  gap: 12px;
+  gap: 0;
   padding: 0;
-  background: transparent;
-  border: none;
+  background: var(--tg-theme-secondary-bg-color, #fff);
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
   z-index: 100;
+  padding-bottom: env(safe-area-inset-bottom, 0);
 }
 
 .navbar a {
   flex: 1;
   text-decoration: none;
-  color: var(--tg-theme-text-color, #111);
+  color: var(--tg-theme-hint-color, #6b7280);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 4px;
-  padding: 12px 16px;
-  background: var(--tg-theme-secondary-bg-color, #fff);
-  border-radius: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-  border: 2px solid transparent;
+  padding: 10px 8px;
+  background: transparent;
+  border: none;
+  border-right: 1px solid rgba(0, 0, 0, 0.06);
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.navbar a:last-child {
+  border-right: none;
 }
 
 .navbar a:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  background: rgba(0, 0, 0, 0.03);
 }
 
 .navbar a.active {
+  color: var(--tg-theme-link-color, #0ea5e9);
+  background: transparent;
+}
+
+.navbar a.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
   background: var(--tg-theme-link-color, #0ea5e9);
-  color: #fff;
-  border-color: var(--tg-theme-link-color, #0ea5e9);
-  box-shadow: 0 4px 16px rgba(14, 165, 233, 0.3);
 }
 
 .navbar .icon {
@@ -72,14 +86,14 @@ h1, h2, h3 { margin: 0 0 12px; }
 }
 
 .navbar .label {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 500;
   line-height: 1;
 }
 
 /* === SearchBar === */
 .search-container {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .search-box {
@@ -187,38 +201,46 @@ h1, h2, h3 { margin: 0 0 12px; }
 }
 
 /* === CatalogPage - Tabs === */
-/* Главные вкладки - большие и выделенные */
+/* Вкладки в стиле браузера - главные и крупные */
 .tabs {
   display: flex;
-  gap: 12px;
-  margin-bottom: 20px;
-  padding-bottom: 16px;
-  border-bottom: 2px solid var(--tg-theme-section-bg-color, #f0f0f0);
+  gap: 0;
+  margin-bottom: 0;
+  border-bottom: 3px solid #e5e7eb;
+  position: relative;
 }
 
 .tabs button {
   flex: 1;
-  border: 2px solid #e5e7eb;
-  border-radius: 16px;
-  padding: 14px 20px;
-  background: var(--tg-theme-secondary-bg-color, #fff);
+  border: none;
+  border-bottom: 4px solid transparent;
+  border-radius: 0;
+  padding: 16px 24px;
+  background: transparent;
   cursor: pointer;
-  font-size: 16px;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  font-size: 18px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  color: var(--tg-theme-hint-color, #6b7280);
+  position: relative;
+  margin-bottom: -3px;
 }
 
 .tabs button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  color: var(--tg-theme-text-color, #111);
+  background: rgba(0, 0, 0, 0.02);
 }
 
 .tabs button.active {
-  background: var(--tg-theme-link-color, #0ea5e9);
-  color: #fff;
-  border-color: var(--tg-theme-link-color, #0ea5e9);
-  box-shadow: 0 4px 16px rgba(14, 165, 233, 0.25);
+  color: var(--tg-theme-link-color, #0ea5e9);
+  font-weight: 700;
+  border-bottom-color: var(--tg-theme-link-color, #0ea5e9);
+  background: transparent;
+}
+
+/* Отступ после вкладок для кнопок магазинов/категорий */
+.tabs + .stores {
+  margin-top: 24px;
 }
 
 /* Кнопки магазинов/категорий - меньше и скромнее */
@@ -241,16 +263,98 @@ h1, h2, h3 { margin: 0 0 12px; }
 /* === PlanPage - Table === */
 .price { text-align:right; white-space:nowrap; }
 .table { width:100%; border-collapse: collapse; }
-.table th, .table td { padding: 8px; border-bottom:1px solid var(--tg-section-sep); vertical-align: top; }
+.table th, .table td { padding: 8px; border-bottom:1px solid var(--tg-section-sep); vertical-align: middle; }
 .table thead th { color: var(--tg-hint); font-weight:600; }
 
-.clickable-item {
-  cursor: pointer;
-  transition: background 0.2s;
+/* Колонки для чекбокса и действий */
+.checkbox-col {
+  width: 40px;
+  text-align: center;
+  padding: 8px 4px !important;
 }
 
-.clickable-item:hover {
-  background: rgba(0, 0, 0, 0.03);
+.action-col {
+  width: 50px;
+  text-align: center;
+  padding: 8px 4px !important;
+}
+
+/* Кастомный чекбокс в стиле Apple Notes */
+.custom-checkbox {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #d1d1d6;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: transparent;
+  position: relative;
+}
+
+.custom-checkbox:hover {
+  border-color: #999;
+}
+
+.custom-checkbox.checked {
+  border-color: var(--tg-theme-link-color, #0ea5e9);
+  background: transparent;
+}
+
+.custom-checkbox .inner-circle {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--tg-theme-link-color, #0ea5e9);
+  animation: scaleIn 0.2s ease;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Кнопка удаления - иконка корзины */
+.delete-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  transition: all 0.2s ease;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #4a5568;
+  opacity: 0.7;
+}
+
+.delete-btn:hover {
+  opacity: 1;
+  color: #2d3748;
+  transform: scale(1.15);
+}
+
+.delete-btn svg {
+  display: block;
+}
+
+/* Состояние отмеченного товара */
+tr.checked {
+  opacity: 0.5;
+}
+
+tr.checked td {
+  text-decoration: line-through;
+  color: var(--tg-theme-hint-color, #999);
 }
 
 tr.removing {
@@ -258,7 +362,7 @@ tr.removing {
   transition: opacity 0.3s;
 }
 
-tr.removing .clickable-item {
+tr.removing td {
   text-decoration: line-through;
 }
 
@@ -293,6 +397,12 @@ tr.removing .clickable-item {
   align-items: center;
   font-size: 18px;
   color: var(--tg-theme-text-color, #111);
+}
+
+.total-details {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 /* === Modal === */
@@ -349,6 +459,16 @@ tr.removing .clickable-item {
 
 .modal-actions .btn {
   flex: 1;
+}
+
+.modal-actions .btn.primary {
+  background: var(--tg-theme-link-color, #0ea5e9);
+  color: white;
+  font-weight: 600;
+}
+
+.modal-actions .btn.primary:hover {
+  background: #0284c7;
 }
 
 /* === ListsPage === */
@@ -520,4 +640,18 @@ tr.removing .clickable-item {
   font-size: 14px;
   font-weight: 500;
   margin: 0;
+}
+
+/* === Transition Effects === */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.fade-enter-from {
+  opacity: 0;
+}
+
+.fade-leave-to {
+  opacity: 0;
 }

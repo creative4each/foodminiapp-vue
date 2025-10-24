@@ -6,7 +6,7 @@
         type="text"
         v-model="searchQuery"
         @input="handleInput"
-        placeholder="Поиск ингредиентов..."
+        placeholder="Поиск по всем товарам..."
         class="search-input"
       />
       <button

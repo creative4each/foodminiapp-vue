@@ -3,7 +3,7 @@
     <div class="card-content">
       <div>
         <div><b>{{ item.title }}</b></div>
-        <div class="muted">{{ item.price }}₽ / {{ item.unit }}</div>
+        <div class="muted">{{ formatPrice(item.price) }} ₽ / {{ item.unit }}</div>
       </div>
       <div class="controls">
         <!-- Предустановленные кнопки для товаров с шагом 0.1 -->
@@ -35,4 +35,8 @@ const qty = computed(()=> cart.items[props.item.id]?.qty || 0)
 function inc(){ cart.inc(props.item, step.value) }
 function dec(){ cart.dec(props.item, step.value) }
 function addAmount(amount){ cart.inc(props.item, amount) }
+function formatPrice(price) {
+  const rounded = Math.round(price)
+  return rounded.toLocaleString('ru-RU')
+}
 </script>
