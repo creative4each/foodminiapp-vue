@@ -67,11 +67,11 @@ onMounted(() => {
 
 const greeting = computed(() => {
   if (!telegramUser.value) {
-    return 'Привет, неизвестный кот! 🐱'
+    return 'Привет, неизвестный кот!'
   }
   
   const firstName = telegramUser.value.first_name || 'друг'
-  return `Добрый день, ${firstName}! 👋`
+  return `Добрый день, ${firstName}`
 })
 
 const avatarEmoji = computed(() => {

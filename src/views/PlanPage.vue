@@ -85,7 +85,8 @@
         Введите название для списка:
       </p>
       <input 
-        v-model="newListName" 
+        :value="newListName" 
+        @input="newListName = String($event.target.value)"
         type="text" 
         class="modal-input"
         placeholder="Например: Недельные покупки"
@@ -104,7 +105,7 @@
     <div class="modal-content" @click.stop>
       <h3>⚠️ Список уже существует</h3>
       <p style="margin-bottom: 16px;">
-        Список с названием <b>"{{ newListName }}"</b> уже существует.
+        Список с названием <b>"{{ String(newListName || '') }}"</b> уже существует.
       </p>
       <p class="muted" style="margin-bottom: 20px;">
         Хотите обновить его текущими товарами?
@@ -229,7 +230,8 @@ async function saveAsList() {
     const allItems = groupedItems.value.flatMap(group => group.items)
     const payload = allItems.map(i => ({ id: i.id, qty: i.qty }))
     const tgUserId = getTelegramUserId()
-    const listName = newListName.value.trim()
+    // Всегда преобразуем название в строку
+    const listName = String(newListName.value || '').trim()
     
     console.log('🔵 Сохранение списка:', {
       userId: tgUserId,
@@ -331,7 +333,8 @@ async function confirmOverwrite() {
   try {
     const allItems = groupedItems.value.flatMap(group => group.items)
     const payload = allItems.map(i => ({ id: i.id, qty: i.qty }))
-    const listName = newListName.value.trim()
+    // Всегда преобразуем название в строку
+    const listName = String(newListName.value || '').trim()
     
     console.log('📝 Обновление существующего списка:', existingListToUpdate.value.list_id)
     

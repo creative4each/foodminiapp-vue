@@ -122,7 +122,13 @@ export const useCatalogStore = defineStore('catalog', {
         console.log(`🔄 Загружаем списки пользователя ${userId} с сервера...`)
         const response = await getLists(userId)
         
-        this.userLists = response.lists || []
+        // Принудительно преобразуем list_name в строку для каждого списка
+        const lists = (response.lists || []).map(list => ({
+          ...list,
+          list_name: String(list.list_name || '')
+        }))
+        
+        this.userLists = lists
         this.currentUserId = userId
         this.listsLoaded = true
         this.listsLoadedAt = Date.now()

@@ -17,8 +17,7 @@
     <div v-for="list in sortedLists" :key="list.list_id" class="list-card">
       <div class="list-header">
         <div class="list-title">
-          <span class="list-icon">📝</span>
-          <span>{{ list.list_name }}</span>
+          <span>{{ String(list.list_name || '') }}</span>
         </div>
         <div class="list-meta">
           <span class="list-date">{{ formatDate(list.created_at) }}</span>
@@ -55,7 +54,8 @@
     <div class="modal-content" @click.stop>
       <h3>Переименовать список</h3>
       <input 
-        v-model="editingListName" 
+        :value="editingListName" 
+        @input="editingListName = String($event.target.value)"
         type="text" 
         class="modal-input"
         placeholder="Новое название списка"
@@ -72,7 +72,7 @@
   <div v-if="showDeleteModal" class="modal-overlay" @click="closeDeleteModal">
     <div class="modal-content" @click.stop>
       <h3>Удалить список?</h3>
-      <p>Вы уверены, что хотите удалить список "{{ deletingList?.list_name }}"?</p>
+      <p>Вы уверены, что хотите удалить список "{{ String(deletingList?.list_name || '') }}"?</p>
       <div class="modal-actions">
         <button class="btn danger" @click="performDelete">Удалить</button>
         <button class="btn" @click="closeDeleteModal">Отмена</button>
@@ -203,12 +203,13 @@ async function loadListToCart(listId) {
 
 function editList(list) {
   editingList.value = list
-  editingListName.value = list.list_name
+  editingListName.value = String(list.list_name || '')
   showEditModal.value = true
 }
 
 async function saveEdit() {
-  if (!editingListName.value.trim()) {
+  const listName = String(editingListName.value || '').trim()
+  if (!listName) {
     alert('Введите название списка')
     return
   }
@@ -216,14 +217,14 @@ async function saveEdit() {
   try {
     await updateList(
       editingList.value.list_id,
-      editingListName.value.trim(),
+      listName,
       undefined, // items не меняем
       undefined, // sum не меняем
       undefined  // weight не меняем
     )
     
     // Обновляем в кэше
-    const updatedList = { ...editingList.value, list_name: editingListName.value.trim() }
+    const updatedList = { ...editingList.value, list_name: listName }
     catalogStore.updateListInCache(updatedList)
     lists.value = catalogStore.userLists
     
