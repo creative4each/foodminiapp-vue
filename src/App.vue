@@ -15,10 +15,12 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import NavBar from './components/NavBar.vue'
 import LoadingScreen from './components/LoadingScreen.vue'
 import { useCatalogStore } from './store/catalog'
 
+const router = useRouter()
 const catalogStore = useCatalogStore()
 const isLoading = ref(true)
 
@@ -32,6 +34,12 @@ onMounted(async () => {
     // Минимальная задержка для показа экрана загрузки
     // (чтобы пользователь успел увидеть приветствие)
     await new Promise(resolve => setTimeout(resolve, 1500))
+    
+    // Принудительно переходим на страницу каталога если не на ней
+    if (router.currentRoute.value.path !== '/') {
+      console.log('📍 Переход на главную страницу')
+      await router.push('/')
+    }
   } catch (error) {
     console.error('❌ Ошибка загрузки данных:', error)
   } finally {

@@ -48,7 +48,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useCatalogStore } from '../store/catalog'
 import ProductCard from '../components/ProductCard.vue'
 import SearchBar from '../components/SearchBar.vue'
@@ -65,16 +65,35 @@ const categories = computed(() => catalogStore.categories)
 const catalog = computed(() => catalogStore.catalog)
 const loading = computed(() => catalogStore.isLoadingCatalog)
 
+// Функция для установки активного ID
+function setDefaultActiveId() {
+  if (!activeId.value) {
+    if (mode.value === 'stores' && stores.value.length > 0) {
+      activeId.value = stores.value[0].id
+      console.log('✅ Установлен активный магазин:', activeId.value)
+    }
+    if (mode.value === 'categories' && categories.value.length > 0) {
+      activeId.value = categories.value[0].id
+      console.log('✅ Установлена активная категория:', activeId.value)
+    }
+  }
+}
+
+// Следим за загрузкой магазинов и автоматически устанавливаем активный
+watch(stores, (newStores) => {
+  if (newStores.length > 0 && !activeId.value && mode.value === 'stores') {
+    activeId.value = newStores[0].id
+    console.log('✅ Магазины загружены, установлен активный:', activeId.value)
+  }
+}, { immediate: true })
+
 onMounted(async () => {
+  console.log('📱 CatalogPage mounted')
   // Данные уже загружены в App.vue, просто используем из кэша
-  await catalogStore.fetchCatalog() // это мгновенно вернёт закэшированные данные
+  await catalogStore.fetchCatalog()
   
-  if (mode.value === 'stores' && stores.value[0]) {
-    activeId.value = stores.value[0].id
-  }
-  if (mode.value === 'categories' && categories.value[0]) {
-    activeId.value = categories.value[0].id
-  }
+  // Устанавливаем активный ID после загрузки
+  setDefaultActiveId()
 })
 
 function switchMode(m) {
